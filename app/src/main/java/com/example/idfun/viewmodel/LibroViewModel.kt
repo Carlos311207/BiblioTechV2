@@ -35,6 +35,20 @@ class LibroViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun actualizarLibro(libro: Libro) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.actualizarLibro(libro)
+            _libros.value = repository.obtenerLibros()
+        }
+    }
+
+    fun eliminarLibro(libro: Libro) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.eliminarLibro(libro)
+            _libros.value = repository.obtenerLibros()
+        }
+    }
+
     fun cargarLibroPorId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _libroSeleccionado.value = repository.obtenerLibroPorId(id)

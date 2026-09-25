@@ -9,6 +9,14 @@ class LibroRepository(
         return libroDao.insertarLibro(libro)
     }
 
+    fun actualizarLibro(libro: Libro) {
+        libroDao.actualizarLibro(libro)
+    }
+
+    fun eliminarLibro(libro: Libro) {
+        libroDao.eliminarLibro(libro)
+    }
+
     fun obtenerLibros(): List<Libro> {
         return libroDao.obtenerLibros()
     }

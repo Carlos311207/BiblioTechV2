@@ -3,9 +3,8 @@ package com.example.idfun
 import android.app.Application
 import com.example.idfun.data.BibliotecaDatabase
 import com.example.idfun.data.DatabaseProvider
-
+import com.example.idfun.data.EstudianteRepository
 import com.example.idfun.data.LibroRepository
-
 
 class BibliotecaApplication : Application() {
 
@@ -18,5 +17,12 @@ class BibliotecaApplication : Application() {
 
     val libroRepository: LibroRepository by lazy {
         LibroRepository(libroDao)
+    }
+
+    val estudianteDao
+        get() = database.estudianteDao()
+
+    val estudianteRepository: EstudianteRepository by lazy {
+        EstudianteRepository(estudianteDao)
     }
 }

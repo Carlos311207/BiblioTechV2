@@ -6,29 +6,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.idfun.BibliotecaApplication
-import com.example.idfun.data.librosPrueba
 
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.ViewModelProvider
+import com.example.idfun.BibliotecaApplication
+import com.example.idfun.viewmodel.EstudianteViewModel
 import com.example.idfun.viewmodel.LibroViewModel
-import androidx.compose.runtime.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navegacion(
     navController: NavHostController
 ) {
+    
     var mensaje by remember { mutableStateOf<String?>(null) }
 
-    NavHost(navController = navController,
+    NavHost(
+        navController = navController,
         startDestination = "inicio"
     ) {
+
+        // =========================================================
+        // INICIO
+        // =========================================================
+
         composable("inicio") {
+
             PantallaPrincipal(
                 onCatalogo = {
                     navController.navigate("catalogo")
@@ -38,114 +49,190 @@ fun Navegacion(
                 },
                 onPrestados = {
                     navController.navigate("prestados")
+                },
+                onEstudiantes = {
+                    navController.navigate("estudiantes")
                 }
             )
         }
 
+
+        // =========================================================
+        // CATALOGO DE LIBROS
+        // =========================================================
+
         composable("catalogo") {
+
             PantallaCatalogo(
                 onRegresar = {
                     navController.popBackStack()
                 },
-                {idLibro -> navController.navigate("detalle/$idLibro")},
-                onAgregarLibro = {navController.navigate("agregar")},
+
+                onVerDetalles = { idLibro ->
+                    navController.navigate("detalle/$idLibro")
+                },
+
+                onAgregarLibro = {
+                    navController.navigate("agregar")
+                },
+
                 mensaje = mensaje,
-                onMensajeMostrado = { mensaje = null }
+
+                onMensajeMostrado = {
+                    mensaje = null
+                }
             )
         }
 
-        composable("agregar"){
+
+        // =========================================================
+        // AGREGAR LIBRO
+        // =========================================================
+
+        composable("agregar") {
+
             PantallaAgregarLibro(
                 viewModel = viewModel(),
+
                 onGuardar = {
-                    //mensaje a mostrar cuando se guarde el libro
+
                     mensaje = "✔ Libro guardado con éxito"
+
                     navController.popBackStack()
                 },
+
                 onCancelar = {
                     navController.popBackStack()
                 }
-
             )
         }
 
 
+        // =========================================================
+        // DETALLE DEL LIBRO
+        // =========================================================
+
         composable("detalle/{idLibro}") {
-            val idLibro = it.arguments?.getString("idLibro")?.toIntOrNull() //###
-            //--
-            val app = LocalContext.current.applicationContext as BibliotecaApplication
+
+            val idLibro =
+                it.arguments
+                    ?.getString("idLibro")
+                    ?.toIntOrNull()
+
+            val app =
+                LocalContext.current
+                    .applicationContext as BibliotecaApplication
 
             val viewModel: LibroViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
-                    override  fun <T : ViewModel> create(
+
+                    override fun <T : ViewModel> create(
                         modelClass: Class<T>
                     ): T {
-                        return LibroViewModel(app as Application) as T
+
+                        @Suppress("UNCHECKED_CAST")
+                        return LibroViewModel(
+                            app as Application
+                        ) as T
                     }
                 }
             )
 
-            val libro by viewModel.libroSeleccionado.collectAsState()
-            //#
+            val libro by
+            viewModel.libroSeleccionado.collectAsState()
+
             LaunchedEffect(idLibro) {
-                if (idLibro != null){
+
+                if (idLibro != null) {
                     viewModel.cargarLibroPorId(idLibro)
                 }
             }
-            if (libro != null){
-                PantallaDetalleLibro(libro = libro!!,
-                    onRegresar = {navController.popBackStack()},
 
+            if (libro != null) {
 
+                PantallaDetalleLibro(
+                    libro = libro!!,
+
+                    onRegresar = {
+                        navController.popBackStack()
+                    },
 
                     navController = navController,
 
+                    onEditar = { idLibroEditar ->
 
-
-
-                    onEditar = {
-                        //invoca a la ruta de edicion pasando el id del libro
-                            idLibro -> navController.navigate("editar/$idLibro")
+                        navController.navigate(
+                            "editar/$idLibroEditar"
+                        )
                     },
-                    onEliminar = {
-                        //elimina el libro pasando el objeto libro
-                            libroEliminar-> viewModel.eliminarLibro(libroEliminar)
-                        //mensaje a mostrar cuando se elimine el libro
-                        mensaje = "✔ Libro eliminado con éxito"
-                        //regresa a la pantalla de catalogo
+
+                    onEliminar = { libroEliminar ->
+
+                        viewModel.eliminarLibro(
+                            libroEliminar
+                        )
+
+                        mensaje =
+                            "✔ Libro eliminado con éxito"
+
                         navController.popBackStack()
-                    })
+                    }
+                )
             }
         }
+
+
+        // =========================================================
+        // EDITAR LIBRO
+        // =========================================================
+
         composable("editar/{idLibro}") {
-            val idLibro = it.arguments?.getString("idLibro")?.toIntOrNull() //###
-            val app = LocalContext.current.applicationContext as BibliotecaApplication
+
+            val idLibro =
+                it.arguments
+                    ?.getString("idLibro")
+                    ?.toIntOrNull()
+
+            val app =
+                LocalContext.current
+                    .applicationContext as BibliotecaApplication
+
             val viewModel: LibroViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
-                    override  fun <T : ViewModel> create(
+
+                    override fun <T : ViewModel> create(
                         modelClass: Class<T>
                     ): T {
 
-                        return LibroViewModel(app as Application) as T
+                        @Suppress("UNCHECKED_CAST")
+                        return LibroViewModel(
+                            app as Application
+                        ) as T
                     }
                 }
             )
-            val libro by viewModel.libroSeleccionado.collectAsState()
+
+            val libro by
+            viewModel.libroSeleccionado.collectAsState()
 
             LaunchedEffect(idLibro) {
-                if (idLibro != null){
+
+                if (idLibro != null) {
                     viewModel.cargarLibroPorId(idLibro)
                 }
             }
+
             if (libro != null) {
+
                 PantallaEditarLibro(
+
                     libro = libro!!,
-
-
 
                     onGuardar = { libroEditado ->
 
-                        viewModel.actualizarLibro(libroEditado)
+                        viewModel.actualizarLibro(
+                            libroEditado
+                        )
 
                         navController.previousBackStackEntry
                             ?.savedStateHandle
@@ -154,17 +241,21 @@ fun Navegacion(
                                 "✓ Cambios guardados correctamente"
                             )
 
-
                         navController.popBackStack()
-
                     },
+
                     onCancelar = {
                         navController.popBackStack()
                     }
-
                 )
             }
         }
+
+
+        // =========================================================
+        // PRESTAMO
+        // =========================================================
+
         composable("prestamo") {
 
             PantallaPrestamo(
@@ -174,6 +265,11 @@ fun Navegacion(
             )
         }
 
+
+        // =========================================================
+        // LIBROS PRESTADOS
+        // =========================================================
+
         composable("prestados") {
 
             PantallaLibrosPrestados(
@@ -182,5 +278,143 @@ fun Navegacion(
                 }
             )
         }
+
+
+        // =========================================================
+        // ESTUDIANTES
+        // =========================================================
+
+        composable("estudiantes") {
+
+            PantallaEstudiantes(
+
+                onRegresar = {
+                    navController.popBackStack()
+                },
+
+                onVerDetalles = { idEstudiante ->
+
+                    navController.navigate(
+                        "detalleEstudiante/$idEstudiante"
+                    )
+                },
+
+                onAgregarEstudiante = {
+
+                    navController.navigate(
+                        "agregarEstudiante"
+                    )
+                },
+
+                mensaje = mensaje,
+
+                onMensajeMostrado = {
+                    mensaje = null
+                }
+            )
+        }
+
+
+        // =========================================================
+        // AGREGAR ESTUDIANTE
+        // =========================================================
+
+        composable("agregarEstudiante") {
+
+            val app =
+                LocalContext.current
+                    .applicationContext as BibliotecaApplication
+
+            val viewModel: EstudianteViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+
+                    override fun <T : ViewModel> create(
+                        modelClass: Class<T>
+                    ): T {
+
+                        @Suppress("UNCHECKED_CAST")
+                        return EstudianteViewModel(
+                            app as Application
+                        ) as T
+                    }
+                }
+            )
+
+            PantallaAgregarEstudiante(
+
+                viewModel = viewModel,
+
+                onGuardar = {
+
+                    mensaje =
+                        "✔ Estudiante guardado con éxito"
+
+                    navController.popBackStack()
+                },
+
+                onCancelar = {
+
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        // =========================================================
+        // DETALLE DEL ESTUDIANTE
+        // =========================================================
+
+        composable("detalleEstudiante/{idEstudiante}") {
+
+            val idEstudiante =
+                it.arguments
+                    ?.getString("idEstudiante")
+                    ?.toIntOrNull()
+
+            val app =
+                LocalContext.current
+                    .applicationContext as BibliotecaApplication
+
+            val viewModel: EstudianteViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+
+                    override fun <T : ViewModel> create(
+                        modelClass: Class<T>
+                    ): T {
+
+                        @Suppress("UNCHECKED_CAST")
+                        return EstudianteViewModel(
+                            app as Application
+                        ) as T
+                    }
+                }
+            )
+
+            val estudiante by
+            viewModel.estudianteSeleccionado.collectAsState()
+
+            LaunchedEffect(idEstudiante) {
+
+                if (idEstudiante != null) {
+
+                    viewModel.cargarEstudiantePorId(
+                        idEstudiante
+                    )
+                }
+            }
+
+            if (estudiante != null) {
+
+                PantallaDetalleEstudiante(
+
+                    estudiante = estudiante!!,
+
+                    onRegresar = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
     }
+
 }

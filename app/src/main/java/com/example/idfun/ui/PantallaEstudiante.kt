@@ -1,142 +1,6 @@
 package com.example.idfun.ui
 
-// ============================================
-// IMPORTACIONES DE LAYOUT
-// ============================================
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-
-
-// ============================================
-// IMPORTACIONES DE MATERIAL 3
-// ============================================
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-
-
-// ============================================
-// IMPORTACIONES DE COMPOSE
-// ============================================
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-
-// ============================================
-// MODELO
-// ============================================
-import com.example.bibliotech.model.Estudiante
-
-
-
-
-// ============================================
-// TARJETA DE ESTUDIANTE
-// ============================================
-// Este componente representa visualmente a un
-// estudiante dentro de la lista.
-//
-// Es equivalente a TarjetaLibro, pero adaptado
-// a los datos de la entidad Estudiante.
-// ============================================
-@Composable
-fun TarjetaEstudiante(
-    estudiante: Estudiante,
-    onVerDetalles: () -> Unit
-) {
-
-
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-
-        Column(
-            modifier = Modifier.padding(10.dp)
-        ) {
-
-
-            // ========================================
-            // INFORMACIÓN PRINCIPAL
-            // ========================================
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-
-                // Icono que representa al estudiante
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Estudiante",
-                    modifier = Modifier.size(32.dp)
-                )
-
-
-                Spacer(
-                    modifier = Modifier.width(12.dp)
-                )
-
-
-                Column {
-
-
-                    // Nombre completo
-                    Text(
-                        text = "${estudiante.nombres} ${estudiante.apellidos}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-
-                    // Número de carnet
-                    Text(
-                        text = "Carnet: ${estudiante.carnet}"
-                    )
-
-
-                    // Grado y sección
-                    Text(
-                        text = "${estudiante.grado} — Sección ${estudiante.seccion}"
-                    )
-                }
-            }
-        }
-
-
-
-
-        // ========================================
-        // BOTÓN VER
-        // ========================================
-        Button(
-            onClick = onVerDetalles,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(6.dp)
-        ) {
-            Text("Ver")
-        }
-    }
-}
-
-package com.example.bibliotech.ui
-
-
-// ===============================
-// IMPORTACIONES DE COMPOSE
-// ===============================
+import android.app.Application
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -151,29 +15,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-
-
-// ===============================
-// IMPORTACIONES DE MATERIAL 3
-// ===============================
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-
-
-// ===============================
-// IMPORTACIONES DE RUNTIME
-// ===============================
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -181,37 +38,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-
-
-// ===============================
-// IMPORTACIONES DE VIEWMODEL
-// ===============================
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-
-
-// ===============================
-// OTRAS IMPORTACIONES
-// ===============================
-import android.app.Application
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.bibliotech.BibliotecaApplication
-import com.example.bibliotech.viewmodel.EstudianteViewModel
-
-
-// ===============================
-// IMPORTACIONES DEL PROYECTO
-// ===============================
-import com.example.bibliotech.ui.componentes.TarjetaEstudiante
-
-
-
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.idfun.BibliotecaApplication
+import com.example.idfun.ui.componentes.TarjetaEstudiante
+import com.example.idfun.viewmodel.EstudianteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -223,270 +61,78 @@ fun PantallaEstudiantes(
     onMensajeMostrado: () -> Unit
 ) {
 
+    val app = LocalContext.current.applicationContext as BibliotecaApplication
 
-    // =========================================================
-    // OBTENEMOS LA APLICACIÓN
-    // =========================================================
-    // Nos permite acceder al Repository de estudiantes
-    // mediante BibliotecaApplication.
-    val app =
-        LocalContext.current.applicationContext as BibliotecaApplication
-
-
-
-
-    // =========================================================
-    // CREAMOS EL VIEWMODEL
-    // =========================================================
     val viewModel: EstudianteViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
-
-
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>
-            ): T {
-
-
-                return EstudianteViewModel(
-                    app as Application
-                ) as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return EstudianteViewModel(app as Application) as T
             }
         }
     )
 
-
-
-
-    // =========================================================
-    // OBSERVAMOS LA LISTA DE ESTUDIANTES
-    // =========================================================
-    // collectAsState permite que la interfaz se actualice
-    // automáticamente cuando cambia la lista.
     val estudiantes by viewModel.estudiantes.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
 
-
-
-    // =========================================================
-    // CONFIGURACIÓN DEL SNACKBAR
-    // =========================================================
-    val snackbarHostState =
-        remember { SnackbarHostState() }
-
-
-
-
-    // =========================================================
-    // CARGAR ESTUDIANTES
-    // =========================================================
-    // Se ejecuta cuando entramos a esta pantalla.
     LaunchedEffect(Unit) {
         viewModel.cargarEstudiantes()
     }
 
-
-
-
-    // =========================================================
-    // MOSTRAR MENSAJES
-    // =========================================================
-    // Por ejemplo:
-    // "✓ Estudiante agregado correctamente"
-    // "✓ Estudiante eliminado correctamente"
     LaunchedEffect(mensaje) {
-
-
         if (mensaje != null) {
-
-
             snackbarHostState.showSnackbar(mensaje)
-
-
             onMensajeMostrado()
         }
     }
 
+    var textoBusqueda by remember { mutableStateOf("") }
 
+    val grados = listOf("Todos", "1° Bachillerato", "2° Bachillerato", "3° Bachillerato")
+    var gradoSeleccionado by remember { mutableStateOf("Todos") }
 
+    val secciones = listOf("Todas", "A", "B", "C")
+    var seccionSeleccionada by remember { mutableStateOf("Todas") }
 
-    // =========================================================
-    // CAMPO DE BÚSQUEDA
-    // =========================================================
-    var textoBusqueda by remember {
-        mutableStateOf("")
-    }
-
-
-
-
-    // =========================================================
-    // LISTA DE GRADOS
-    // =========================================================
-    val grados = listOf(
-        "Todos",
-        "1° Bachillerato",
-        "2° Bachillerato",
-        "3° Bachillerato"
-    )
-
-
-
-
-    // =========================================================
-    // GRADO SELECCIONADO
-    // =========================================================
-    var gradoSeleccionado by remember {
-        mutableStateOf("Todos")
-    }
-
-
-
-
-    // =========================================================
-    // LISTA DE SECCIONES
-    // =========================================================
-    val secciones = listOf(
-        "Todas",
-        "A",
-        "B",
-        "C"
-    )
-
-
-
-
-    // =========================================================
-    // SECCIÓN SELECCIONADA
-    // =========================================================
-    var seccionSeleccionada by remember {
-        mutableStateOf("Todas")
-    }
-
-
-
-
-    // =========================================================
-    // FILTRAR ESTUDIANTES
-    // =========================================================
     val estudiantesFiltrados = estudiantes.filter { estudiante ->
+        val coincideTexto = estudiante.carnet.contains(textoBusqueda, ignoreCase = true) ||
+                estudiante.nombres.contains(textoBusqueda, ignoreCase = true) ||
+                estudiante.apellidos.contains(textoBusqueda, ignoreCase = true)
 
+        val coincideGrado = gradoSeleccionado == "Todos" || estudiante.grado == gradoSeleccionado
 
-        // -----------------------------------------------------
-        // BUSCAR POR CARNET, NOMBRES O APELLIDOS
-        // -----------------------------------------------------
-        val coincideTexto =
-            estudiante.carnet.contains(
-                textoBusqueda,
-                ignoreCase = true
-            ) ||
-                    estudiante.nombres.contains(
-                        textoBusqueda,
-                        ignoreCase = true
-                    ) ||
-                    estudiante.apellidos.contains(
-                        textoBusqueda,
-                        ignoreCase = true
-                    )
+        val coincideSeccion = seccionSeleccionada == "Todas" || estudiante.seccion == seccionSeleccionada
 
-
-
-
-        // -----------------------------------------------------
-        // FILTRAR POR GRADO
-        // -----------------------------------------------------
-        val coincideGrado =
-            gradoSeleccionado == "Todos" ||
-                    estudiante.grado == gradoSeleccionado
-
-
-
-
-        // -----------------------------------------------------
-        // FILTRAR POR SECCIÓN
-        // -----------------------------------------------------
-        val coincideSeccion =
-            seccionSeleccionada == "Todas" ||
-                    estudiante.seccion == seccionSeleccionada
-
-
-
-
-        // -----------------------------------------------------
-        // EL ESTUDIANTE DEBE CUMPLIR LOS TRES FILTROS
-        // -----------------------------------------------------
-        coincideTexto &&
-                coincideGrado &&
-                coincideSeccion
+        coincideTexto && coincideGrado && coincideSeccion
     }
 
-
-
-
-    // =========================================================
-    // ESTRUCTURA PRINCIPAL
-    // =========================================================
     Scaffold(
-
-
-        // -----------------------------------------------------
-        // SNACKBAR
-        // -----------------------------------------------------
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState
-            )
-        },
-
-
-
-
-        // -----------------------------------------------------
-        // BOTÓN FLOTANTE
-        // -----------------------------------------------------
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButtonPosition = FabPosition.Start,
-
-
         floatingActionButton = {
-
-
             FloatingActionButton(
                 onClick = onAgregarEstudiante,
                 containerColor = Color.DarkGray
             ) {
-
-
-                Text(
-                    text = "+",
-                    color = Color.White
-                )
+                Text(text = "+", color = Color.White)
             }
         },
-
-
-
-
-        // -----------------------------------------------------
-        // BARRA SUPERIOR
-        // -----------------------------------------------------
         topBar = {
-
-
             TopAppBar(
-                title = {
-                    Text("Estudiantes")
+                title = { Text("Estudiantes") },
+                navigationIcon = {
+                    IconButton(onClick = onRegresar) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Regresar"
+                        )
+                    }
                 }
             )
         }
-
-
     ) { padding ->
 
-
-
-
-        // =====================================================
-        // CONTENIDO
-        // =====================================================
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -494,268 +140,85 @@ fun PantallaEstudiantes(
                 .fillMaxSize()
         ) {
 
-
-
-
-            // =================================================
-            // BUSCADOR
-            // =================================================
             OutlinedTextField(
-
-
                 value = textoBusqueda,
-
-
-                onValueChange = {
-                    textoBusqueda = it
-                },
-
-
-                label = {
-                    Text("Buscar estudiante")
-                },
-
-
-                placeholder = {
-                    Text("Carnet, nombres o apellidos")
-                },
-
-
+                onValueChange = { textoBusqueda = it },
+                label = { Text("Buscar estudiante") },
+                placeholder = { Text("Carnet, nombres o apellidos") },
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(text = "Grado", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(6.dp))
 
-
-
-            // =================================================
-            // FILTRO DE GRADO
-            // =================================================
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
-
-
-            Text(
-                text = "Grado",
-                fontWeight = FontWeight.Bold
-            )
-
-
-            Spacer(
-                modifier = Modifier.height(6.dp)
-            )
-
-
-
-
-            Row(
-                modifier = Modifier.horizontalScroll(
-                    rememberScrollState()
-                )
-            ) {
-
-
+            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 grados.forEach { grado ->
-
-
                     FilterChip(
-
-
-                        selected =
-                            gradoSeleccionado == grado,
-
-
-                        onClick = {
-                            gradoSeleccionado = grado
-                        },
-
-
-                        label = {
-                            Text(grado)
-                        }
+                        selected = gradoSeleccionado == grado,
+                        onClick = { gradoSeleccionado = grado },
+                        label = { Text(grado) }
                     )
-
-
-                    Spacer(
-                        modifier = Modifier.width(8.dp)
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(text = "Sección", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(6.dp))
 
-
-
-            // =================================================
-            // FILTRO DE SECCIÓN
-            // =================================================
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
-
-
-            Text(
-                text = "Sección",
-                fontWeight = FontWeight.Bold
-            )
-
-
-            Spacer(
-                modifier = Modifier.height(6.dp)
-            )
-
-
-
-
-            Row(
-                modifier = Modifier.horizontalScroll(
-                    rememberScrollState()
-                )
-            ) {
-
-
+            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 secciones.forEach { seccion ->
-
-
                     FilterChip(
-
-
-                        selected =
-                            seccionSeleccionada == seccion,
-
-
-                        onClick = {
-                            seccionSeleccionada = seccion
-                        },
-
-
-                        label = {
-                            Text(seccion)
-                        }
+                        selected = seccionSeleccionada == seccion,
+                        onClick = { seccionSeleccionada = seccion },
+                        label = { Text(seccion) }
                     )
-
-
-                    Spacer(
-                        modifier = Modifier.width(8.dp)
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
 
-
-
-            // =================================================
-            // ESPACIO ANTES DE LA LISTA
-            // =================================================
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
-
-
-
-
-            // =================================================
-            // SI NO HAY RESULTADOS
-            // =================================================
             if (estudiantesFiltrados.isEmpty()) {
-
-
                 Column(
-
-
                     modifier = Modifier
                         .fillMaxWidth()
+                        .weight(1f)
                         .padding(top = 40.dp),
-
-
-                    horizontalAlignment =
-                        Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-
                     Icon(
-
-
                         imageVector = Icons.Default.Person,
-
-
-                        contentDescription =
-                            "Sin resultados",
-
-
+                        contentDescription = "Sin resultados",
                         modifier = Modifier.size(48.dp)
                     )
-
-
-
-
-                    Spacer(
-                        modifier = Modifier.height(12.dp)
-                    )
-
-
-
-
-                    Text(
-                        text = "No se encontraron estudiantes",
-                        fontWeight = FontWeight.Bold
-                    )
-
-
-
-
-                    Text(
-                        text =
-                            "Prueba con otro carnet, nombre o filtro"
-                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(text = "No se encontraron estudiantes", fontWeight = FontWeight.Bold)
+                    Text(text = "Prueba con otro carnet, nombre o filtro")
                 }
-
-
             } else {
-
-
-
-
-                // =================================================
-                // LISTA DE ESTUDIANTES
-                // =================================================
                 LazyColumn(
-
-
-                    verticalArrangement =
-                        Arrangement.spacedBy(10.dp),
-
-
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-
-
-                    items(
-                        estudiantesFiltrados
-                    ) { estudiante ->
-
-
+                    items(estudiantesFiltrados) { estudiante ->
                         TarjetaEstudiante(
-
-
                             estudiante = estudiante,
-
-
-                            onVerDetalles = {
-                                onVerDetalles(
-                                    estudiante.id
-                                )
-                            }
+                            onVerDetalles = { onVerDetalles(estudiante.id) }
                         )
                     }
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
 
-
-
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
+            OutlinedButton(
+                onClick = onRegresar,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Regresar al Menú Principal")
+            }
         }
     }
 }
