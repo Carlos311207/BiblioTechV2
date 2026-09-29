@@ -1,7 +1,12 @@
 package com.example.idfun.ui
 
 import android.app.Application
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -9,6 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,7 +33,7 @@ import com.example.idfun.viewmodel.LibroViewModel
 fun Navegacion(
     navController: NavHostController
 ) {
-    
+
     var mensaje by remember { mutableStateOf<String?>(null) }
 
     NavHost(
@@ -291,12 +298,9 @@ fun Navegacion(
                 onRegresar = {
                     navController.popBackStack()
                 },
-
+                
                 onVerDetalles = { idEstudiante ->
-
-                    navController.navigate(
-                        "detalleEstudiante/$idEstudiante"
-                    )
+                    navController.navigate("detalleEstudiante/$idEstudiante")
                 },
 
                 onAgregarEstudiante = {
@@ -411,10 +415,92 @@ fun Navegacion(
 
                     onRegresar = {
                         navController.popBackStack()
+                    },
+
+                    navController = navController,
+
+                    onEditar = { idEstudianteEditar ->
+                        navController.navigate("editarEstudiante/$idEstudianteEditar")
+                    },
+
+                    onEliminar = { estudianteEliminar ->
+                        viewModel.eliminarEstudiante(estudianteEliminar)
+                        mensaje = "✓ Estudiante eliminado con éxito"
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+
+        // =========================================================
+        // EDITAR ESTUDIANTE
+        // =========================================================
+
+        composable("editarEstudiante/{idEstudiante}") {
+
+            val idEstudiante =
+                it.arguments
+                    ?.getString("idEstudiante")
+                    ?.toIntOrNull()
+
+            val app =
+                LocalContext.current
+                    .applicationContext as BibliotecaApplication
+
+            val viewModel: EstudianteViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+
+                    override fun <T : ViewModel> create(
+                        modelClass: Class<T>
+                    ): T {
+
+                        @Suppress("UNCHECKED_CAST")
+                        return EstudianteViewModel(
+                            app as Application
+                        ) as T
+                    }
+                }
+            )
+
+            val estudiante by
+            viewModel.estudianteSeleccionado.collectAsState()
+
+            LaunchedEffect(idEstudiante) {
+
+                if (idEstudiante != null) {
+                    viewModel.cargarEstudiantePorId(idEstudiante)
+                }
+            }
+
+            if (estudiante != null) {
+
+                PantallaEditarEstudiante(
+
+                    estudiante = estudiante!!,
+
+                    onGuardar = { estudianteEditado ->
+
+                        viewModel.actualizarEstudiante(
+                            estudianteEditado
+                        )
+
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(
+                                "mensaje",
+                                "✓ Cambios guardados correctamente"
+                            )
+
+                        navController.popBackStack()
+                    },
+
+                    onCancelar = {
+                        navController.popBackStack()
                     }
                 )
             }
         }
     }
-
 }
+  

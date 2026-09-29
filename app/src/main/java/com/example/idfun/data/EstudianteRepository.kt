@@ -9,6 +9,14 @@ class EstudianteRepository(
         return estudianteDao.insertarEstudiante(estudiante)
     }
 
+    fun actualizarEstudiante(estudiante: Estudiante) {
+        estudianteDao.actualizarEstudiante(estudiante)
+    }
+
+    fun eliminarEstudiante(estudiante: Estudiante) {
+        estudianteDao.eliminarEstudiante(estudiante)
+    }
+
     fun obtenerEstudiantes(): List<Estudiante> {
         return estudianteDao.obtenerEstudiantes()
     }

@@ -35,6 +35,20 @@ class EstudianteViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun actualizarEstudiante(estudiante: Estudiante) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.actualizarEstudiante(estudiante)
+            _estudiantes.value = repository.obtenerEstudiantes()
+        }
+    }
+
+    fun eliminarEstudiante(estudiante: Estudiante) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.eliminarEstudiante(estudiante)
+            _estudiantes.value = repository.obtenerEstudiantes()
+        }
+    }
+
     fun cargarEstudiantePorId(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _estudianteSeleccionado.value = repository.obtenerEstudiantePorId(id)
