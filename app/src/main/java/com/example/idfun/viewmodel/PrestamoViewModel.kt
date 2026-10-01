@@ -94,6 +94,7 @@ class PrestamoViewModel(application: Application) : AndroidViewModel(application
             val ibroActualizado = libro.copy(disponible = false)
             libroRepository.actualizarLibro(ibroActualizado)
 
+
             //Actualizar los datos de las listas
            val librosActualizados = libroRepository.obtenerLibros()
             _librosDisponibles.value = librosActualizados.filter { it.disponible }
