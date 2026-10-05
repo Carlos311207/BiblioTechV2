@@ -268,6 +268,10 @@ fun Navegacion(
             PantallaPrestamo(
                 onRegresar = {
                     navController.popBackStack()
+                },
+                onPrestamoGuardado = {
+                    mensaje = "✔ Préstamo guardado con éxito"
+                    navController.popBackStack()
                 }
             )
         }
