@@ -59,6 +59,11 @@ fun Navegacion(
                 },
                 onEstudiantes = {
                     navController.navigate("estudiantes")
+                },
+
+                mensaje = mensaje,
+                onMensajeMostrado = {
+                    mensaje = null
                 }
             )
         }
